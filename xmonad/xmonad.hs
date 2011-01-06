@@ -13,6 +13,8 @@ import XMonad.Layout.Spiral
 import XMonad.Layout.Tabbed
 import XMonad.Util.Run(spawnPipe)
 import XMonad.Util.EZConfig(additionalKeys)
+import XMonad.Actions.GridSelect
+import XMonad.Actions.WindowGo
 
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
@@ -20,7 +22,7 @@ import qualified Data.Map        as M
 -- The preferred terminal program, which is used in a binding below and by
 -- certain contrib modules.
 --
-myTerminal      = "gnome-terminal"
+myTerminal      = "konsole"
  
 -- Width of the window border in pixels.
 --
@@ -31,7 +33,7 @@ myBorderWidth   = 1
 -- ("right alt"), which does not conflict with emacs keybindings. The
 -- "windows key" is usually mod4Mask.
 --
-myModMask       = mod1Mask
+myModMask       = mod4Mask
  
 -- The mask for the numlock key. Numlock status is "masked" from the
 -- current modifier status, so the keybindings will work with numlock on or
@@ -137,6 +139,12 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
  
     -- Restart xmonad
     , ((modMask              , xK_q     ), restart "xmonad" True)
+
+    -- All Apps in Grid View
+    , ((modMask              , xK_g     ), goToSelected defaultGSConfig)
+
+    -- alt space brings up yakuake
+    , ((mod1Mask             , xK_space ), runOrRaise "yakuake"  (title =? "scratch"))
     ]
     ++
  
@@ -191,8 +199,9 @@ myTabConfig = defaultTheme {   activeBorderColor = "#7C7C7C"
                              , activeColor = "#000000"
                              , inactiveBorderColor = "#7C7C7C"
                              , inactiveTextColor = "#EEEEEE"
-                             , inactiveColor = "#000000" }
-myLayout = avoidStruts (tiled ||| Mirror tiled ||| tabbed shrinkText myTabConfig ||| Full ||| spiral (6/7))
+                             , inactiveColor = "#000000"
+                             , fontName = "xft:Terminus:pixelsize=10" }
+myLayout = avoidStruts (tabbed shrinkText myTabConfig ||| tiled ||| Mirror tiled ||| Full ||| spiral (6/7))
   where
      -- default tiling algorithm partitions the screen into two panes
      tiled   = Tall nmaster delta ratio
@@ -224,23 +233,23 @@ myLayout = avoidStruts (tiled ||| Mirror tiled ||| tabbed shrinkText myTabConfig
 myManageHook = composeAll
     [ className =? "MPlayer"        --> doFloat
     , className =? "Smplayer"       --> doFloat
-    , className =? "Psx.real"       --> doFloat
+--    , className =? "Psx.real"       --> doFloat
     , className =? "Gimp"           --> doFloat
-    , className =? "Galculator"     --> doFloat
-    , resource  =? "Komodo_find2"   --> doFloat
-    , resource  =? "compose"        --> doFloat
-    , className =? "Terminal"       --> doShift "1:code"
-    , className =? "Gedit"          --> doShift "1:code"
-    , className =? "Emacs"          --> doShift "1:code"
-    , className =? "Komodo Edit"    --> doShift "1:code"
-    , className =? "Emacs"          --> doShift "1:code"
-    , className =? "Google-chrome"  --> doShift "2:web"
-    , className =? "Thunderbird-bin" --> doShift "3:msg"
-    , className =? "Pidgin"         --> doShift "3:msg"
-    , className =? "VirtualBox"     --> doShift "4:vm"
-    , className =? "banshee-1"      --> doShift "5:media"
-    , className =? "Ktorrent"       --> doShift "5:media"
-    , className =? "Xchat"          --> doShift "5:media"
+--    , className =? "Galculator"     --> doFloat
+    , className =? "Yakuake"        --> doFloat
+--    , resource  =? "Komodo_find2"   --> doFloat
+--    , resource  =? "compose"        --> doFloat
+--    , className =? "Terminal"       --> doShift "1:code"
+--    , className =? "Gedit"          --> doShift "1:code"
+--    , className =? "Emacs"          --> doShift "1:code"
+--    , className =? "Komodo Edit"    --> doShift "1:code"
+--    , className =? "Google-chrome"  --> doShift "2:web"
+--    , className =? "Thunderbird" --> doShift "3:msg"
+--    , className =? "Pidgin"         --> doShift "3:msg"
+--    , className =? "VirtualBox"     --> doShift "4:vm"
+--    , className =? "banshee-1"      --> doShift "5:media"
+--    , className =? "Ktorrent"       --> doShift "5:media"
+--    , className =? "Xchat"          --> doShift "5:media"
     , resource  =? "desktop_window" --> doIgnore
     , resource  =? "kdesktop"       --> doIgnore ]
  
