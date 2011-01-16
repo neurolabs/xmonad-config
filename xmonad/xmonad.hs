@@ -13,8 +13,13 @@ import XMonad.Layout.Spiral
 import XMonad.Layout.Tabbed
 import XMonad.Util.Run(spawnPipe)
 import XMonad.Util.EZConfig(additionalKeys)
+import XMonad.Util.Scratchpad
+import XMonad.Util.WorkspaceCompare
 import XMonad.Actions.GridSelect
 import XMonad.Actions.WindowGo
+import XMonad.Actions.CycleWS
+import Control.Monad (liftM2)
+
 
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
@@ -22,6 +27,7 @@ import qualified Data.Map        as M
 -- The preferred terminal program, which is used in a binding below and by
 -- certain contrib modules.
 --
+-- Using konsole with Scratchpad gives a nice quake style multitab console.
 myTerminal      = "konsole"
  
 -- Width of the window border in pixels.
@@ -34,6 +40,9 @@ myBorderWidth   = 1
 -- "windows key" is usually mod4Mask.
 --
 myModMask       = mod4Mask
+
+-- second modmask for custom bindings
+myOtherModMask  = mod1Mask
  
 -- The mask for the numlock key. Numlock status is "masked" from the
 -- current modifier status, so the keybindings will work with numlock on or
@@ -59,7 +68,7 @@ myNumlockMask   = mod2Mask
 --
 -- > workspaces = ["web", "irc", "code" ] ++ map show [4..9]
 --
-myWorkspaces    = ["1:code","2:web","3:msg","4:vm","5:media","6","7","8","9"]
+myWorkspaces    = ["1:code","2:web","3:pmsg","4:mail","5:vm","6:misc"]
  
 -- Border colors for unfocused and focused windows, respectively.
 --
@@ -99,10 +108,14 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((modMask,               xK_Tab   ), windows W.focusDown)
  
     -- Move focus to the next window
-    , ((modMask,               xK_j     ), windows W.focusDown)
+    , ((modMask,               xK_l     ), windows W.focusDown)
+    , ((modMask,               xK_Right ), windows W.focusDown)
+--    , ((shiftMask,             xK_Right ), windows W.focusDown)
  
     -- Move focus to the previous window
-    , ((modMask,               xK_k     ), windows W.focusUp  )
+    , ((modMask,               xK_j     ), windows W.focusUp  )
+    , ((modMask,               xK_Left  ), windows W.focusUp  )
+--    , ((shiftMask,             xK_Left  ), windows W.focusUp  )
  
     -- Move focus to the master window
     , ((modMask,               xK_m     ), windows W.focusMaster  )
@@ -117,10 +130,10 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((modMask .|. shiftMask, xK_k     ), windows W.swapUp    )
  
     -- Shrink the master area
-    , ((modMask,               xK_h     ), sendMessage Shrink)
+--  , ((modMask,               xK_h     ), sendMessage Shrink)
  
     -- Expand the master area
-    , ((modMask,               xK_l     ), sendMessage Expand)
+--  , ((modMask,               xK_l     ), sendMessage Expand)
  
     -- Push window back into tiling
     , ((modMask,               xK_t     ), withFocused $ windows . W.sink)
@@ -144,7 +157,17 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((modMask              , xK_g     ), goToSelected defaultGSConfig)
 
     -- alt space brings up yakuake
-    , ((mod1Mask             , xK_space ), runOrRaise "yakuake"  (title =? "scratch"))
+    --, ((mod1Mask             , xK_space ), runOrRaise "yakuake"  (title =? "scratch"))
+    
+    -- switch to prev/next workspace
+    , ((modMask              , xK_i     ), moveTo Prev (WSIs notSP))
+    , ((modMask              , xK_k     ), moveTo Next (WSIs notSP))
+    , ((modMask              , xK_Up    ), windows . W.greedyView =<< findWorkspace getSortByIndexNoSP Prev HiddenNonEmptyWS 1)
+    , ((modMask              , xK_Down  ), windows . W.greedyView =<< findWorkspace getSortByIndexNoSP Next HiddenNonEmptyWS 1)
+
+    -- quake style console
+    , ((myOtherModMask         , xK_space  ), scratchpadSpawnAction conf)
+    
     ]
     ++
  
@@ -164,9 +187,22 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     [((m .|. modMask, key), screenWorkspace sc >>= flip whenJust (windows . f))
         | (key, sc) <- zip [xK_w, xK_e, xK_r] [0..]
         , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
+  where 
+    notSP = (return $ (\x -> x /= "NSP" && x /= "SP") . W.tag) :: X (WindowSpace -> Bool)
+    -- | any workspace but scratchpad
+    shiftAndView dir = findWorkspace getSortByIndex dir (WSIs notSP) 1
+            >>= \t -> (windows . W.shift $ t) >> (windows . W.greedyView $ t)
+    -- | hidden, non-empty workspaces less scratchpad
+    shiftAndView' dir = findWorkspace getSortByIndexNoSP dir HiddenNonEmptyWS 1
+            >>= \t -> (windows . W.shift $ t) >> (windows . W.greedyView $ t)
+    getSortByIndexNoSP =
+            fmap (.scratchpadFilterOutWorkspace) getSortByIndex
+    -- | toggle any workspace but scratchpad
+    myToggle = windows $ W.view =<< W.tag . head . filter 
+            ((\x -> x /= "NSP" && x /= "SP") . W.tag) . W.hidden
+    
  
- 
-------------------------------------------------------------------------
+-----------------------------------------------------------------------e
 -- Mouse bindings: default actions bound to mouse events
 --
 myMouseBindings (XConfig {XMonad.modMask = modMask}) = M.fromList $
@@ -201,6 +237,7 @@ myTabConfig = defaultTheme {   activeBorderColor = "#7C7C7C"
                              , inactiveTextColor = "#EEEEEE"
                              , inactiveColor = "#000000"
                              , fontName = "xft:Terminus:pixelsize=10" }
+
 myLayout = avoidStruts (tabbed shrinkText myTabConfig ||| tiled ||| Mirror tiled ||| Full ||| spiral (6/7))
   where
      -- default tiling algorithm partitions the screen into two panes
@@ -230,29 +267,30 @@ myLayout = avoidStruts (tabbed shrinkText myTabConfig ||| tiled ||| Mirror tiled
 -- To match on the WM_NAME, you can use 'title' in the same way that
 -- 'className' and 'resource' are used below.
 --
-myManageHook = composeAll
-    [ className =? "MPlayer"        --> doFloat
-    , className =? "Smplayer"       --> doFloat
---    , className =? "Psx.real"       --> doFloat
-    , className =? "Gimp"           --> doFloat
---    , className =? "Galculator"     --> doFloat
-    , className =? "Yakuake"        --> doFloat
---    , resource  =? "Komodo_find2"   --> doFloat
---    , resource  =? "compose"        --> doFloat
---    , className =? "Terminal"       --> doShift "1:code"
---    , className =? "Gedit"          --> doShift "1:code"
---    , className =? "Emacs"          --> doShift "1:code"
---    , className =? "Komodo Edit"    --> doShift "1:code"
---    , className =? "Google-chrome"  --> doShift "2:web"
---    , className =? "Thunderbird" --> doShift "3:msg"
---    , className =? "Pidgin"         --> doShift "3:msg"
---    , className =? "VirtualBox"     --> doShift "4:vm"
---    , className =? "banshee-1"      --> doShift "5:media"
---    , className =? "Ktorrent"       --> doShift "5:media"
---    , className =? "Xchat"          --> doShift "5:media"
-    , resource  =? "desktop_window" --> doIgnore
-    , resource  =? "kdesktop"       --> doIgnore ]
- 
+myManageHook = composeAll . concat $
+    [ [ className =? c --> doFloat | c <- myClassFloats ]
+    , [ title =? t --> doFloat | t <- myTitleFloats ]
+    , [ resource =? r --> doFloat | r <- myResourceFloats ]
+    , [ resource =? r --> doIgnore | r <- myIgnores ]
+    , [ className =? c --> viewShift "1:code" | c <- codeApps ]
+    , [ className =? c --> viewShift "2:web" | c <- webApps ]
+    , [ className =? c --> viewShift "3:pmsg" | c <- pmsgApps ]
+    , [ className =? c --> viewShift "4:mail" | c <- mailApps ]
+    , [ className =? c --> viewShift "5:vm" | c <- vmApps ]
+    , [ scratchpadManageHook (W.RationalRect 0 0 1 1) ]
+    ]
+ where
+   myClassFloats = ["MPlayer", "Gimp", "Smplayer", "Xdialog"]
+   myTitleFloats = ["alsamixer",".", "Firefox Preferences", "Selenium IDE"]
+   myResourceFloats = ["compose"]
+   myIgnores = ["desktop_window", "kdesktop", "stalonetray"]
+   codeApps = ["Eclipse"]
+   webApps = ["Firefox", "Icecat", "Chromium", "Arora", "Firefox-bin", "Opera"]
+   pmsgApps = ["XChat"]
+   mailApps = ["Thunderbird"]
+   vmApps = ["VirtualBox"]
+   viewShift = doF . liftM2 (.) W.greedyView W.shift
+
 -- Whether focus follows the mouse pointer.
 myFocusFollowsMouse :: Bool
 myFocusFollowsMouse = True
@@ -292,6 +330,7 @@ main = do
                                 , ppTitle = xmobarColor "#FFB6B0" "" . shorten 100
                                 , ppCurrent = xmobarColor "#CEFFAC" ""
                                 , ppSep = "   "
+                                , ppSort = fmap (.scratchpadFilterOutWorkspace) getSortByTag
                                 }
 		, manageHook = manageDocks <+> myManageHook
 		, startupHook = setWMName "LG3D"
