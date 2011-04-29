@@ -13,6 +13,8 @@ xsetroot -cursor_name left_ptr
 #urxvtd -q -o -f
 #urxvtc
 
+klipper
+
 eval "$(gpg-agent --daemon)"
 
 xmonad

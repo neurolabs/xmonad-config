@@ -3,7 +3,7 @@
 -- http://github.com/vicfryzel/xmonad-config
 -- This is setup for dual 1680x1050 monitors, with the right monitor as primary
 
-Config { font = "xft:Terminus:pixelsize=10"
+Config { font = "xft:Terminus:pixelsize=9"
       , bgColor = "#000000"
       , fgColor = "#ffffff"
       , position = Static { xpos = 0, ypos = 0, width = 1280, height = 16 }

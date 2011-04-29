@@ -127,13 +127,13 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((modMask .|. shiftMask, xK_j     ), windows W.swapDown  )
  
     -- Swap the focused window with the previous window
-    , ((modMask .|. shiftMask, xK_k     ), windows W.swapUp    )
+    , ((modMask .|. shiftMask, xK_l     ), windows W.swapUp    )
  
     -- Shrink the master area
---  , ((modMask,               xK_h     ), sendMessage Shrink)
+    , ((modMask,               xK_y     ), sendMessage Shrink)
  
     -- Expand the master area
---  , ((modMask,               xK_l     ), sendMessage Expand)
+    , ((modMask,               xK_x     ), sendMessage Expand)
  
     -- Push window back into tiling
     , ((modMask,               xK_t     ), withFocused $ windows . W.sink)
@@ -162,6 +162,8 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     -- switch to prev/next workspace
     , ((modMask              , xK_i     ), moveTo Prev (WSIs notSP))
     , ((modMask              , xK_k     ), moveTo Next (WSIs notSP))
+    , ((modMask .|. shiftMask, xK_i     ), shiftAndView Prev)
+    , ((modMask .|. shiftMask, xK_k     ), shiftAndView Next)
     , ((modMask              , xK_Up    ), windows . W.greedyView =<< findWorkspace getSortByIndexNoSP Prev HiddenNonEmptyWS 1)
     , ((modMask              , xK_Down  ), windows . W.greedyView =<< findWorkspace getSortByIndexNoSP Next HiddenNonEmptyWS 1)
 
@@ -236,9 +238,9 @@ myTabConfig = defaultTheme {   activeBorderColor = "#7C7C7C"
                              , inactiveBorderColor = "#7C7C7C"
                              , inactiveTextColor = "#EEEEEE"
                              , inactiveColor = "#000000"
-                             , fontName = "xft:Terminus:pixelsize=10" }
+                             , fontName = "xft:Terminus:pixelsize=9" }
 
-myLayout = avoidStruts (tabbed shrinkText myTabConfig ||| tiled ||| Mirror tiled ||| Full ||| spiral (6/7))
+myLayout = avoidStruts (tabbed shrinkText myTabConfig ||| tiled )
   where
      -- default tiling algorithm partitions the screen into two panes
      tiled   = Tall nmaster delta ratio
@@ -277,15 +279,15 @@ myManageHook = composeAll . concat $
     , [ className =? c --> viewShift "3:pmsg" | c <- pmsgApps ]
     , [ className =? c --> viewShift "4:mail" | c <- mailApps ]
     , [ className =? c --> viewShift "5:vm" | c <- vmApps ]
-    , [ scratchpadManageHook (W.RationalRect 0 0 1 1) ]
+    , [ scratchpadManageHook (W.RationalRect 0 0.016 1 0.985) ]
     ]
  where
-   myClassFloats = ["MPlayer", "Gimp", "Smplayer", "Xdialog"]
-   myTitleFloats = ["alsamixer",".", "Firefox Preferences", "Selenium IDE"]
+   myClassFloats = ["MPlayer", "Gimp", "Smplayer", "Xdialog", "Kcalc", "Download"]
+   myTitleFloats = ["alsamixer",".", "Firefox Preferences", "Selenium IDE", "Download"]
    myResourceFloats = ["compose"]
    myIgnores = ["desktop_window", "kdesktop", "stalonetray"]
    codeApps = ["Eclipse"]
-   webApps = ["Firefox", "Icecat", "Chromium", "Arora", "Firefox-bin", "Opera"]
+   webApps = ["Firefox", "GNU IceCat", "Chrome", "Arora", "Firefox-bin", "Opera"]
    pmsgApps = ["XChat"]
    mailApps = ["Thunderbird"]
    vmApps = ["VirtualBox"]
@@ -293,7 +295,7 @@ myManageHook = composeAll . concat $
 
 -- Whether focus follows the mouse pointer.
 myFocusFollowsMouse :: Bool
-myFocusFollowsMouse = True
+myFocusFollowsMouse = False
  
  
 ------------------------------------------------------------------------
