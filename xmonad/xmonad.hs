@@ -87,7 +87,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((modMask .|. controlMask, xK_l     ), spawn "xscreensaver-command -lock")
 
     -- launch dmenu
-    , ((modMask,               xK_p     ), spawn "exe=`dmenu_path | ~/bin/dmenu` && eval \"exec $exe\"")
+    , ((modMask,               xK_p     ), spawn "dmenu_run")
  
     -- launch gmrun
     , ((modMask .|. shiftMask, xK_p     ), spawn "gmrun")
@@ -168,7 +168,12 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((modMask              , xK_Down  ), windows . W.greedyView =<< findWorkspace getSortByIndexNoSP Next HiddenNonEmptyWS 1)
 
     -- quake style console
-    , ((myOtherModMask         , xK_space  ), scratchpadSpawnAction conf)
+    , ((myOtherModMask       , xK_space  ), scratchpadSpawnAction conf)
+
+--    , ((0                    , 0x1008FF11), spawn "amixer -- sset Master playback 8%-")
+--    , ((0                    , 0x1008FF13), spawn "amixer -- sset Master playback 8%+")
+    , ((0                    , 0x1008FF11), spawn "volume -")
+    , ((0                    , 0x1008FF13), spawn "volume +")
     
     ]
     ++
@@ -295,7 +300,7 @@ myManageHook = composeAll . concat $
 
 -- Whether focus follows the mouse pointer.
 myFocusFollowsMouse :: Bool
-myFocusFollowsMouse = False
+myFocusFollowsMouse = True
  
  
 ------------------------------------------------------------------------

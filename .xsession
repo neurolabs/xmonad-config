@@ -6,7 +6,7 @@ xscreensaver -no-splash &
 
 tray &
 
-xv -root -quit etc/images/hornet-1400x1050.jpg
+xv -root -quit etc/images/hornet-1920x1080.png
 
 xsetroot -cursor_name left_ptr
 
@@ -14,6 +14,7 @@ xsetroot -cursor_name left_ptr
 #urxvtc
 
 klipper
+zim
 
 eval "$(gpg-agent --daemon)"
 
