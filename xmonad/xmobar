@@ -13,7 +13,7 @@ Config { font = "xft:Terminus:pixelsize=9"
                    , Run Memory ["-t","Mem: <usedratio>%"] 10
                    , Run Swap ["-t","<used>M"] 10
                    , Run Date "%a %_d.%_m. %H:%M" "date" 10
-                   , Run Battery ["-t","Bat: <left>"] 10
+                   , Run Battery ["-t","Bat: <left>","-L", "5", "-H", "10","--low","red","--normal","orange","--high","green"] 10
                    , Run StdinReader
                    ]
       , sepChar = "%"
