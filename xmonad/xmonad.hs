@@ -68,7 +68,7 @@ myNumlockMask   = mod2Mask
 --
 -- > workspaces = ["web", "irc", "code" ] ++ map show [4..9]
 --
-myWorkspaces    = ["1:code","2:web","3:pmsg","4:mail","5:vm","6:misc"]
+myWorkspaces    = ["1:code","2:web","3:pmsg","4:mail","5:vm","6:wiki","7:wiki"]
  
 -- Border colors for unfocused and focused windows, respectively.
 --
@@ -160,12 +160,12 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     --, ((mod1Mask             , xK_space ), runOrRaise "yakuake"  (title =? "scratch"))
     
     -- switch to prev/next workspace
-    , ((modMask              , xK_i     ), moveTo Prev (WSIs notSP))
-    , ((modMask              , xK_k     ), moveTo Next (WSIs notSP))
-    , ((modMask .|. shiftMask, xK_i     ), shiftAndView Prev)
-    , ((modMask .|. shiftMask, xK_k     ), shiftAndView Next)
-    , ((modMask              , xK_Up    ), windows . W.greedyView =<< findWorkspace getSortByIndexNoSP Prev HiddenNonEmptyWS 1)
-    , ((modMask              , xK_Down  ), windows . W.greedyView =<< findWorkspace getSortByIndexNoSP Next HiddenNonEmptyWS 1)
+    , ((modMask              , xK_i     ), moveTo Next (WSIs notSP))
+    , ((modMask              , xK_k     ), moveTo Prev (WSIs notSP))
+    , ((modMask .|. shiftMask, xK_i     ), shiftAndView Next)
+    , ((modMask .|. shiftMask, xK_k     ), shiftAndView Prev)
+    , ((modMask              , xK_Up    ), windows . W.greedyView =<< findWorkspace getSortByIndexNoSP Next HiddenNonEmptyWS 1)
+    , ((modMask              , xK_Down  ), windows . W.greedyView =<< findWorkspace getSortByIndexNoSP Prev HiddenNonEmptyWS 1)
 
     -- quake style console
     , ((myOtherModMask       , xK_space  ), scratchpadSpawnAction conf)
@@ -174,6 +174,10 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
 --    , ((0                    , 0x1008FF13), spawn "amixer -- sset Master playback 8%+")
     , ((0                    , 0x1008FF11), spawn "volume -")
     , ((0                    , 0x1008FF13), spawn "volume +")
+    , ((modMask              , 0x1008FF11), spawn "volume ---")
+    , ((modMask              , 0x1008FF13), spawn "volume +++")
+    , ((modMask .|. shiftMask, 0x1008FF11), spawn "volume ----------")
+    , ((modMask .|. shiftMask, 0x1008FF13), spawn "volume ++++++++++")
     
     ]
     ++
@@ -284,6 +288,7 @@ myManageHook = composeAll . concat $
     , [ className =? c --> viewShift "3:pmsg" | c <- pmsgApps ]
     , [ className =? c --> viewShift "4:mail" | c <- mailApps ]
     , [ className =? c --> viewShift "5:vm" | c <- vmApps ]
+    , [ className =? c --> viewShift "7:wiki" | c <- wikiApps ]
     , [ scratchpadManageHook (W.RationalRect 0 0.016 1 0.985) ]
     ]
  where
@@ -296,6 +301,7 @@ myManageHook = composeAll . concat $
    pmsgApps = ["XChat"]
    mailApps = ["Thunderbird"]
    vmApps = ["VirtualBox"]
+   wikiApps = ["Zim"]
    viewShift = doF . liftM2 (.) W.greedyView W.shift
 
 -- Whether focus follows the mouse pointer.
@@ -355,7 +361,7 @@ defaults = defaultConfig {
         focusFollowsMouse  = myFocusFollowsMouse,
         borderWidth        = myBorderWidth,
         modMask            = myModMask,
-        numlockMask        = myNumlockMask,
+--        numlockMask        = myNumlockMask,
         workspaces         = myWorkspaces,
         normalBorderColor  = myNormalBorderColor,
         focusedBorderColor = myFocusedBorderColor,

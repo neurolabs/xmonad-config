@@ -13,8 +13,12 @@ xsetroot -cursor_name left_ptr
 #urxvtd -q -o -f
 #urxvtc
 
+# turn off trackpoint by default
+xinput set-int-prop "TPPS/2 IBM TrackPoint" "Device Enabled" 8 0
+
 klipper
-zim
+zim --plugin trayicon
+kmix --keepvisibility
 
 eval "$(gpg-agent --daemon)"
 
