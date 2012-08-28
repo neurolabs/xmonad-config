@@ -286,7 +286,7 @@ myManageHook = composeAll . concat $
     , [ className =? c --> viewShift "4:mail" | c <- mailApps ]
     , [ className =? c --> viewShift "5:vm" | c <- vmApps ]
     , [ className =? c --> viewShift "7:wiki" | c <- wikiApps ]
-    , [ scratchpadManageHook (W.RationalRect 0 0.015 1 0.985 ) ]
+    , [ scratchpadManageHook (W.RationalRect 0 0.016 1 0.984 ) ]
     ]
  where
    myClassFloats = ["MPlayer", "Gimp", "Smplayer", "Xdialog", "Kcalc", "Download"]
