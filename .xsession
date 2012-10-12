@@ -31,7 +31,6 @@ klipper &
 zim --plugin trayicon &
 kmix --keepvisibility &
 nm-applet &
-davmail.sh &
 
 eval "$(gpg-agent --daemon)"
 
