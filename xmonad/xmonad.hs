@@ -7,10 +7,14 @@ import System.Exit
 import XMonad
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
+import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.SetWMName
+import XMonad.Layout.IM
 import XMonad.Layout.NoBorders
+import XMonad.Layout.PerWorkspace
 import XMonad.Layout.Spiral
 import XMonad.Layout.Tabbed
+import XMonad.Layout.Grid
 import XMonad.Util.Run(spawnPipe)
 import XMonad.Util.EZConfig(additionalKeys)
 import XMonad.Util.Scratchpad
@@ -19,6 +23,7 @@ import XMonad.Actions.GridSelect
 import XMonad.Actions.WindowGo
 import XMonad.Actions.CycleWS
 import Control.Monad (liftM2)
+import Data.Ratio ((%))
 
 
 import qualified XMonad.StackSet as W
@@ -246,8 +251,9 @@ myTabConfig = defaultTheme {   activeBorderColor = "#7C7C7C"
                              , inactiveColor = "#000000"
                              , fontName = "xft:Terminus:pixelsize=9" }
 
-myLayout = avoidStruts (tabbed shrinkText myTabConfig ||| tiled )
+myLayout = avoidStruts $ onWorkspace "3:pmsg" imLayout $ standardLayouts
   where
+
      -- default tiling algorithm partitions the screen into two panes
      tiled   = Tall nmaster delta ratio
  
@@ -259,6 +265,15 @@ myLayout = avoidStruts (tabbed shrinkText myTabConfig ||| tiled )
  
      -- Percent of screen to increment by when resizing panes
      delta   = 3/100
+
+     -- standard layouts as a default for workspaces
+     standardLayouts = tabbed shrinkText myTabConfig ||| tiled ||| Grid
+
+     -- notice that withIM, which normally acts on one workspace, can
+     -- also work on a list of workspaces (yay recursive data types!)
+     imLayout = withIM (1%8) (And (Resource "main") (ClassName "psi")) (Grid)
+
+     
  
 ------------------------------------------------------------------------
 -- Window rules:
@@ -294,8 +309,8 @@ myManageHook = composeAll . concat $
    myResourceFloats = ["compose"]
    myIgnores = ["desktop_window", "kdesktop", "stalonetray"]
    codeApps = ["Eclipse"]
-   webApps = ["Firefox", "GNU IceCat", "Chrome", "Arora", "Firefox-bin", "Opera"]
-   pmsgApps = ["XChat"]
+   webApps = ["Firefox", "Chromium-browser", "Google-chrome", "Arora", "Firefox-bin", "Opera"]
+   pmsgApps = ["XChat", "psi" ]
    mailApps = ["Thunderbird"]
    vmApps = ["VirtualBox"]
    wikiApps = ["Zim"]

@@ -31,6 +31,7 @@ klipper &
 zim --plugin trayicon &
 kmix --keepvisibility &
 nm-applet &
+psi &
 
 eval "$(gpg-agent --daemon)"
 
