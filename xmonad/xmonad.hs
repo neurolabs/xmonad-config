@@ -9,6 +9,8 @@ import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.SetWMName
+import XMonad.Hooks.EwmhDesktops
+import XMonad.Hooks.Place
 import XMonad.Layout.IM
 import XMonad.Layout.NoBorders
 import XMonad.Layout.PerWorkspace
@@ -79,6 +81,10 @@ myWorkspaces    = ["1:code","2:web","3:pmsg","4:mail","5:vm","6:wiki","7:wiki"]
 --
 myNormalBorderColor  = "#7c7c7c"
 myFocusedBorderColor = "#ffb6b0"
+
+-- Grid Select config
+--
+myGsConfig = defaultGSConfig { gs_cellheight = 40, gs_cellwidth = 300, gs_font = "xft:Terminus:pixelsize=9" }
  
 ------------------------------------------------------------------------
 -- Key bindings. Add, modify or remove key bindings here.
@@ -159,7 +165,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((modMask              , xK_q     ), restart "xmonad" True)
 
     -- All Apps in Grid View
-    , ((modMask              , xK_g     ), goToSelected defaultGSConfig)
+    , ((modMask              , xK_g     ), goToSelected myGsConfig)
 
     -- switch to prev/next workspace
     , ((modMask              , xK_i     ), moveTo Next (WSIs notSP))
@@ -301,10 +307,10 @@ myManageHook = composeAll . concat $
     , [ className =? c --> viewShift "4:mail" | c <- mailApps ]
     , [ className =? c --> viewShift "5:vm" | c <- vmApps ]
     , [ className =? c --> viewShift "7:wiki" | c <- wikiApps ]
-    , [ scratchpadManageHook (W.RationalRect 0 0.016 1 0.984 ) ]
+    , [ scratchpadManageHook (W.RationalRect 0 0.018 1 0.983 ) ]
     ]
  where
-   myClassFloats = ["MPlayer", "Gimp", "Smplayer", "Xdialog", "Kcalc", "Download"]
+   myClassFloats = ["MPlayer", "Smplayer", "Xdialog", "Kcalc", "Download"]
    myTitleFloats = ["alsamixer",".", "Firefox Preferences", "Selenium IDE", "Download"]
    myResourceFloats = ["compose"]
    myIgnores = ["desktop_window", "kdesktop", "stalonetray"]
@@ -347,18 +353,19 @@ myStartupHook = return ()
  
 -- Run xmonad with the settings you specify. No need to modify this.
 --
+
 main = do
 	xmproc <- spawnPipe "/usr/bin/xmobar ~/.xmonad/xmobar"
-	xmonad $ defaults {
-		logHook            = dynamicLogWithPP $ xmobarPP {
-                                ppOutput = hPutStrLn xmproc
-                                , ppTitle = xmobarColor "#FFB6B0" "" . shorten 100
-                                , ppCurrent = xmobarColor "#CEFFAC" ""
-                                , ppSep = "   "
-                                , ppSort = fmap (.scratchpadFilterOutWorkspace) getSortByTag
-                                }
-		, manageHook = manageDocks <+> myManageHook
-		, startupHook = setWMName "LG3D"
+	xmonad $ defaults { 
+         logHook            = dynamicLogWithPP $ xmobarPP {
+                                 ppOutput = hPutStrLn xmproc
+                                 , ppTitle = xmobarColor "#FFB6B0" "" . shorten 100
+                                 , ppCurrent = xmobarColor "#CEFFAC" ""
+                                 , ppSep = "   " 
+                                 , ppSort = fmap (.scratchpadFilterOutWorkspace) getSortByTag
+                                 }
+        , manageHook = placeHook (withGaps (0,0,0,0) (smart (0.5,0.5))) <+> manageDocks <+> myManageHook
+		, startupHook = ewmhDesktopsStartup >> setWMName "LG3D"
 	}
  
 -- A structure containing your configuration settings, overriding

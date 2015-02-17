@@ -25,6 +25,6 @@ Config { font = "xft:Dina:pixelsize=15"
                    ]
       , sepChar = "%"
       , alignSep = "}{"
-      , template = "%StdinReader% }{ %multicpu% | %memory% %swap% | %battery% | <fc=#FFFFCC>%date%</fc> | %EDDH%"
+      , template = "%StdinReader% }{ %multicpu% | %memory% %swap% | %battery% | %wlan0wi% | <fc=#FFFFCC>%date%</fc> | %EDDH%"
       }
 

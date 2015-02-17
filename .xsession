@@ -10,6 +10,7 @@ PATH=/home/ole/bin:$PATH
 # fi
 
 /usr/libexec/polkit-gnome-authentication-agent-1 &
+/usr/lib64/kde4/libexec/polkit-kde-authentication-agent-1 &
 xscreensaver -no-splash &
 
 tray &
@@ -27,13 +28,17 @@ export SAL_USE_VCLPLUGIN=gen
 # turn off trackpoint by default
 xinput set-int-prop "TPPS/2 IBM TrackPoint" "Device Enabled" 8 0
 
+# make clickpad three big buttons
+clickpad
+
 klipper &
 zim --plugin trayicon &
 kmix --keepvisibility &
 nm-applet &
-psi &
+dbus-launch psi --status=offline&
+
 
 eval "$(gpg-agent --daemon)"
 
-exec ck-launch-session dbus-launch xmonad
+exec ck-launch-session dbus-launch --sh-syntax --exit-with-session xmonad
 
