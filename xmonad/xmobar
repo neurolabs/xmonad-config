@@ -10,7 +10,7 @@
 -- normal = "#CEFFAC"
 -- info = "#96CBFE"
 
-Config { font = "xft:Dina:pixelsize=15"
+Config { font = "xft:Terminus:pixelsize=10"
       , bgColor = "#000000"
       , fgColor = "#ffffff"
       , position = TopW R 90

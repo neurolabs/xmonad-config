@@ -84,7 +84,7 @@ myFocusedBorderColor = "#ffb6b0"
 
 -- Grid Select config
 --
-myGsConfig = defaultGSConfig { gs_cellheight = 40, gs_cellwidth = 300, gs_font = "xft:Terminus:pixelsize=9" }
+myGsConfig = defaultGSConfig { gs_cellheight = 40, gs_cellwidth = 300, gs_font = "xft:Terminus:pixelsize=10" }
  
 ------------------------------------------------------------------------
 -- Key bindings. Add, modify or remove key bindings here.
@@ -255,7 +255,7 @@ myTabConfig = defaultTheme {   activeBorderColor = "#7C7C7C"
                              , inactiveBorderColor = "#7C7C7C"
                              , inactiveTextColor = "#EEEEEE"
                              , inactiveColor = "#000000"
-                             , fontName = "xft:Terminus:pixelsize=9" }
+                             , fontName = "xft:Terminus:pixelsize=10" }
 
 myLayout = avoidStruts $ onWorkspace "3:pmsg" imLayout $ standardLayouts
   where
