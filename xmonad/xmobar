@@ -10,7 +10,7 @@
 -- normal = "#CEFFAC"
 -- info = "#96CBFE"
 
-Config { font = "xft:Terminus:pixelsize=10"
+Config { font = "xft:Dina:pixelsize=12"
       , bgColor = "#000000"
       , fgColor = "#ffffff"
       , position = TopW R 90
@@ -22,11 +22,11 @@ Config { font = "xft:Terminus:pixelsize=10"
                    , Run Date "%a %_d.%_m. %H:%M" "date" 10
                    , Run Battery ["-t","Bat: <left>","-L", "15", "-H", "33","--low","red","--normal","#FFB6B0","--high","#CEFFAC"] 10
                    , Run Wireless "wlp3s0" ["-t","<essid> <quality>","-m","3","--high","#CEFFAC","--normal","#ffdd88","--low","#FFB6B0","-H","50","-L","10"] 10
-                   , Run DiskIO [("sda", "sda:<total>"), ("sdb", "sdb:<total>")] ["-w","4","--low","#CEFFAC","--normal","#ffdd88","--high","#FFB6B0","-H","100000","-L","10000"] 10
+                   , Run DiskIO [("sda", "sda:<total>")] ["-w","4","--low","#CEFFAC","--normal","#ffdd88","--high","#FFB6B0","-H","100000","-L","10000"] 10
                    , Run StdinReader
                    ]
       , sepChar = "%"
       , alignSep = "}{"
-      , template = "%StdinReader% }{ %multicpu% | %memory% %swap% | %diskio% | %battery% | %wlp3s0wi% | <fc=#FFFFCC>%date%</fc> | %EDDH%"
+      , template = "%StdinReader% }{ %multicpu% | %memory% %swap% | %diskio% | %battery% | %wlan0wi% | <fc=#FFFFCC>%date%</fc> | %EDDH%"
       }
 

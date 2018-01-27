@@ -26,6 +26,7 @@ import XMonad.Actions.WindowGo
 import XMonad.Actions.CycleWS
 import Control.Monad (liftM2)
 import Data.Ratio ((%))
+import Data.List
 
 
 import qualified XMonad.StackSet as W
@@ -84,7 +85,7 @@ myFocusedBorderColor = "#ffb6b0"
 
 -- Grid Select config
 --
-myGsConfig = defaultGSConfig { gs_cellheight = 40, gs_cellwidth = 300, gs_font = "xft:Terminus:pixelsize=10" }
+myGsConfig = defaultGSConfig { gs_cellheight = 40, gs_cellwidth = 300, gs_font = "xft:Dina:pixelsize=12" }
  
 ------------------------------------------------------------------------
 -- Key bindings. Add, modify or remove key bindings here.
@@ -174,6 +175,7 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
     , ((modMask .|. shiftMask, xK_k     ), shiftAndView Prev)
     , ((modMask              , xK_Up    ), windows . W.greedyView =<< findWorkspace getSortByIndexNoSP Next HiddenNonEmptyWS 1)
     , ((modMask              , xK_Down  ), windows . W.greedyView =<< findWorkspace getSortByIndexNoSP Prev HiddenNonEmptyWS 1)
+    , ((modMask              , xK_h     ), toggleWS)
 
     -- quake style console
     , ((myOtherModMask       , xK_space  ), scratchpadSpawnAction conf)
@@ -255,7 +257,7 @@ myTabConfig = defaultTheme {   activeBorderColor = "#7C7C7C"
                              , inactiveBorderColor = "#7C7C7C"
                              , inactiveTextColor = "#EEEEEE"
                              , inactiveColor = "#000000"
-                             , fontName = "xft:Terminus:pixelsize=10" }
+                             , fontName = "xft:Dina:pixelsize=12" }
 
 myLayout = avoidStruts $ onWorkspace "3:pmsg" imLayout $ standardLayouts
   where
@@ -296,6 +298,9 @@ myLayout = avoidStruts $ onWorkspace "3:pmsg" imLayout $ standardLayouts
 -- To match on the WM_NAME, you can use 'title' in the same way that
 -- 'className' and 'resource' are used below.
 --
+--
+q ~=? x = fmap (isPrefixOf x) q
+
 myManageHook = composeAll . concat $
     [ [ className =? c --> doFloat | c <- myClassFloats ]
     , [ title =? t --> doFloat | t <- myTitleFloats ]
@@ -307,7 +312,8 @@ myManageHook = composeAll . concat $
     , [ className =? c --> viewShift "4:mail" | c <- mailApps ]
     , [ className =? c --> viewShift "5:vm" | c <- vmApps ]
     , [ className =? c --> viewShift "7:wiki" | c <- wikiApps ]
-    , [ scratchpadManageHook (W.RationalRect 0 0.018 1 0.983 ) ]
+    , [ (className ~=? "jetbrains-") <&&> (title ~=? "win") --> doIgnore ]
+    , [ scratchpadManageHook (W.RationalRect 0 0.018 1 0.900 ) ]
     ]
  where
    myClassFloats = ["MPlayer", "Smplayer", "Xdialog", "Kcalc", "Download"]
@@ -356,7 +362,7 @@ myStartupHook = return ()
 
 main = do
 	xmproc <- spawnPipe "/usr/bin/xmobar ~/.xmonad/xmobar"
-	xmonad $ defaults { 
+	xmonad $ docks $ defaults { 
          logHook            = dynamicLogWithPP $ xmobarPP {
                                  ppOutput = hPutStrLn xmproc
                                  , ppTitle = xmobarColor "#FFB6B0" "" . shorten 100
@@ -364,7 +370,7 @@ main = do
                                  , ppSep = "   " 
                                  , ppSort = fmap (.scratchpadFilterOutWorkspace) getSortByTag
                                  }
-        , manageHook = placeHook (withGaps (0,0,0,0) (smart (0.5,0.5))) <+> manageDocks <+> myManageHook
+        , manageHook = placeHook (withGaps (0,0,0,0) (smart (0.5,0.5))) <+> manageDocks <+> (isFullscreen --> doFullFloat) <+> myManageHook
 		, startupHook = ewmhDesktopsStartup >> setWMName "LG3D"
 	}
  
